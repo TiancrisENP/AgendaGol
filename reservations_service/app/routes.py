@@ -396,6 +396,32 @@ def get_my_reservations(
         size=limit
     )
 
+@reservations_router.get("/field/{field_id}/date/{date}")
+def get_field_reservations_by_date(
+    field_id: int,
+    date: date,
+    db: Session = Depends(get_db)
+):
+    """Obtener reservas de una cancha en una fecha específica (para verificar disponibilidad)"""
+    reservations = db.query(Reservation).filter(
+        and_(
+            Reservation.field_id == field_id,
+            Reservation.status == ReservationStatus.CONFIRMADA,
+            func.date(Reservation.start_time) == date
+        )
+    ).all()
+
+    return [
+        {
+            "id": r.id,
+            "start_time": r.start_time.isoformat(),
+            "end_time": r.end_time.isoformat(),
+            "duration_hours": r.duration_hours,
+            "status": r.status.value
+        }
+        for r in reservations
+    ]
+
 @reservations_router.get("/{reservation_id}", response_model=ReservationResponse)
 def get_reservation(
     reservation_id: int,
@@ -543,32 +569,4 @@ def cancel_reservation(
     )
     
     return {"message": "Reserva cancelada exitosamente"}
-
-# Endpoints para el dashboard y estadísticas
-
-@reservations_router.get("/field/{field_id}/date/{date}")
-def get_field_reservations_by_date(
-    field_id: int,
-    date: date,
-    db: Session = Depends(get_db)
-):
-    """Obtener reservas de una cancha en una fecha específica (para verificar disponibilidad)"""
-    reservations = db.query(Reservation).filter(
-        and_(
-            Reservation.field_id == field_id,
-            Reservation.status == ReservationStatus.CONFIRMADA,
-            func.date(Reservation.start_time) == date
-        )
-    ).all()
-    
-    return [
-        {
-            "id": r.id,
-            "start_time": r.start_time.isoformat(),
-            "end_time": r.end_time.isoformat(),
-            "duration_hours": r.duration_hours,
-            "status": r.status.value
-        }
-        for r in reservations
-    ]
 
