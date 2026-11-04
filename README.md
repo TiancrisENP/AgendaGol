@@ -24,6 +24,26 @@ make init
 
 ---
 
+## Despliegue en Render
+
+El archivo `render.yaml` crea un Postgres compartido y cinco Web Services. Las tablas no se pisan entre servicios.
+
+1. Sube este repositorio a GitHub.
+2. En Render: **New** → **Blueprint** y elige el repositorio.
+3. Cuando los servicios estén en verde, despliega el frontend con su propio `render.yaml`. Debe quedar publicado en `https://agendagol-web.onrender.com`.
+
+URLs del backend:
+
+- Auth: `https://agendagol-auth.onrender.com`
+- Roles: `https://agendagol-roles.onrender.com`
+- Canchas: `https://agendagol-fields.onrender.com`
+- Reservas: `https://agendagol-reservations.onrender.com`
+- Dashboard: `https://agendagol-dashboard.onrender.com`
+
+El plan gratuito duerme los servicios tras un rato sin tráfico. La primera petición después de eso puede tardar cerca de un minuto. No hay usuarios sembrados: regístrate desde el frontend.
+
+---
+
 
 ## Comandos de Gestión
 

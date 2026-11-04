@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./auth_service/Dockerfile
+    env_file:
+      - .env.local
     ports:
       - "8000:8000"
     environment:
@@ -16,6 +18,8 @@ services:
     build:
       context: .
       dockerfile: ./roles_service/Dockerfile
+    env_file:
+      - .env.local
     ports:
       - "8001:8001"
     environment:
@@ -30,6 +34,8 @@ services:
     build:
       context: .
       dockerfile: ./fields_service/Dockerfile
+    env_file:
+      - .env.local
     ports:
       - "8002:8002"
     environment:
@@ -46,6 +52,8 @@ services:
     build:
       context: .
       dockerfile: ./reservations_service/Dockerfile
+    env_file:
+      - .env.local
     ports:
       - "8003:8003"
     environment:
@@ -64,6 +72,8 @@ services:
     build:
       context: .
       dockerfile: ./admin_dashboard/Dockerfile
+    env_file:
+      - .env.local
     ports:
       - "8004:8004"
     environment:

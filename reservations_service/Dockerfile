@@ -14,9 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del servicio
 COPY reservations_service/ .
-COPY .env.local .
 
 EXPOSE 8003
 
-# Comando para iniciar la aplicación: asegura inicialización de DB si es necesario y arranca uvicorn
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8003"]
+CMD ["sh", "-c", "python app/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8003}"]

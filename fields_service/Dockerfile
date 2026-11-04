@@ -14,9 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del servicio
 COPY fields_service/ .
-COPY .env.local .
 
 EXPOSE 8002
 
-# Comando para iniciar la aplicación: asegura inicialización de DB, canchas y arranca uvicorn
-CMD ["sh", "-c", "python app/init_db.py && python init_fields.py && uvicorn app.main:app --host 0.0.0.0 --port 8002"]
+CMD ["sh", "-c", "python app/init_db.py && python init_fields.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8002}"]

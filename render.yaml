@@ -1,0 +1,98 @@
+# Blueprint de Render: Postgres + cinco microservicios.
+# Las URLs publicas usan el nombre de cada servicio: https://<nombre>.onrender.com
+databases:
+  - name: agendagol-db
+    plan: free
+    region: oregon
+    databaseName: agendagol
+
+services:
+  - type: web
+    name: agendagol-auth
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./auth_service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: web
+    name: agendagol-roles
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./roles_service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
+      - key: AUTH_SERVICE_URL
+        value: https://agendagol-auth.onrender.com
+
+  - type: web
+    name: agendagol-fields
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./fields_service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
+      - key: AUTH_SERVICE_URL
+        value: https://agendagol-auth.onrender.com
+      - key: ROLES_SERVICE_URL
+        value: https://agendagol-roles.onrender.com
+      - key: RESERVATIONS_SERVICE_URL
+        value: https://agendagol-reservations.onrender.com
+
+  - type: web
+    name: agendagol-reservations
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./reservations_service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
+      - key: AUTH_SERVICE_URL
+        value: https://agendagol-auth.onrender.com
+      - key: ROLES_SERVICE_URL
+        value: https://agendagol-roles.onrender.com
+      - key: FIELDS_SERVICE_URL
+        value: https://agendagol-fields.onrender.com
+
+  - type: web
+    name: agendagol-dashboard
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./admin_dashboard/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: AUTH_SERVICE_URL
+        value: https://agendagol-auth.onrender.com
+      - key: ROLES_SERVICE_URL
+        value: https://agendagol-roles.onrender.com
+      - key: FIELDS_SERVICE_URL
+        value: https://agendagol-fields.onrender.com
+      - key: RESERVATIONS_SERVICE_URL
+        value: https://agendagol-reservations.onrender.com

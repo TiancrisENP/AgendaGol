@@ -14,9 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del servicio
 COPY auth_service/ .
-COPY .env.local .
 
 EXPOSE 8000
 
-# Comando para iniciar la aplicación: asegura inicialización de DB y arranca uvicorn
-CMD ["sh", "-c", "python app/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Render inyecta PORT. En local, sin esa variable, sigue en 8000.
+CMD ["sh", "-c", "python app/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -14,10 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del servicio
 COPY admin_dashboard/ .
-COPY .env.local .
 
 EXPOSE 8004
 
-# Comando para iniciar la aplicación: el dashboard usualmente lee de otros servicios, no tiene DB propia usualmente
-# Pero si la tuviera, se inicializaría aquí.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8004}"]

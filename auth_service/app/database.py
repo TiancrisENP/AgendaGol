@@ -6,8 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use env var if provided, otherwise fallback to a local sqlite file for easy local testing
-DATABASE_URL = os.getenv("AUTH_DB_URL") or "sqlite:///./auth.db"
+def _database_url() -> str:
+    url = os.getenv("AUTH_DB_URL") or os.getenv("DATABASE_URL") or "sqlite:///./auth.db"
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    return url
+
+DATABASE_URL = _database_url()
 
 # For SQLite we need to set the check_same_thread flag
 if DATABASE_URL.startswith("sqlite"):

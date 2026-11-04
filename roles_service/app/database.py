@@ -6,8 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use env var if provided, otherwise fallback to a local sqlite file for easy local testing
-DATABASE_URL = os.getenv("ROLES_DB_URL") or "sqlite:///./roles.db"
+def _database_url() -> str:
+    url = os.getenv("ROLES_DB_URL") or os.getenv("DATABASE_URL") or "sqlite:///./roles.db"
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    return url
+
+DATABASE_URL = _database_url()
 
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
