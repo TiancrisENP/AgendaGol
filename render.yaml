@@ -1,0 +1,119 @@
+# Blueprint de los microservicios. El sitio web vive en el repo del frontend
+# (servicio agendagol-web). Render inyecta PORT; cada servicio escucha ahí.
+services:
+  - type: web
+    name: agendagol-auth
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd auth_service && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: SECRET_KEY
+        sync: false
+
+  - type: web
+    name: agendagol-roles
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd roles_service && python init_roles.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-auth
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: agendagol-fields
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd fields_service && python init_fields.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-auth
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ROLES_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-roles
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: RESERVATIONS_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-reservations
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: agendagol-reservations
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd reservations_service && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-auth
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ROLES_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-roles
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: FIELDS_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-fields
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: agendagol-dashboard
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd admin_dashboard && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-auth
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: ROLES_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-roles
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: FIELDS_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-fields
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: RESERVATIONS_SERVICE_URL
+        fromService:
+          type: web
+          name: agendagol-reservations
+          envVarKey: RENDER_EXTERNAL_URL
