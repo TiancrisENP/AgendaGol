@@ -37,11 +37,14 @@ def get_current_user(auth_header: str):
             headers={"Authorization": auth_header}
         )
         if auth_response.status_code != 200:
+            detail = "No se pudo verificar la sesión."
             try:
-                error_detail = auth_response.json().get("detail", auth_response.text)
+                payload = auth_response.json().get("detail")
+                if isinstance(payload, str) and payload.strip() and not payload.lstrip().startswith("<"):
+                    detail = payload
             except Exception:
-                error_detail = auth_response.text
-            raise HTTPException(status_code=auth_response.status_code, detail=error_detail)
+                detail = "El servicio de autenticación no respondió. Reintenta en unos segundos."
+            raise HTTPException(status_code=auth_response.status_code, detail=detail)
         
         return auth_response.json()
     except requests.exceptions.RequestException as e:
