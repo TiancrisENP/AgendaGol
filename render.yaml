@@ -14,6 +14,10 @@ services:
         value: "3.12.8"
       - key: SECRET_KEY
         sync: false
+      - key: AUTH_DB_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
 
   - type: web
     name: agendagol-roles
@@ -31,6 +35,10 @@ services:
           type: web
           name: agendagol-auth
           envVarKey: RENDER_EXTERNAL_URL
+      - key: ROLES_DB_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
 
   - type: web
     name: agendagol-fields
@@ -58,6 +66,10 @@ services:
           type: web
           name: agendagol-reservations
           envVarKey: RENDER_EXTERNAL_URL
+      - key: FIELDS_DB_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
 
   - type: web
     name: agendagol-reservations
@@ -85,6 +97,10 @@ services:
           type: web
           name: agendagol-fields
           envVarKey: RENDER_EXTERNAL_URL
+      - key: RESERVATIONS_DB_URL
+        fromDatabase:
+          name: agendagol-db
+          property: connectionString
 
   - type: web
     name: agendagol-dashboard
@@ -117,3 +133,11 @@ services:
           type: web
           name: agendagol-reservations
           envVarKey: RENDER_EXTERNAL_URL
+
+databases:
+  - name: agendagol-db
+    plan: free
+    region: oregon
+    databaseName: agendagol
+    user: agendagol
+    ipAllowList: []
